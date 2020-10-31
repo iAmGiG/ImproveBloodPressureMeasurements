@@ -9,7 +9,7 @@ et = (364.5 - 1.23 * avg_bpm)
 bsa = 0.007184 * (kgs**0.425) * (cm**0.725)
 sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * avg_bpm) + (40.4 * bsa) - (0.51 * age))
 pp = sv / ((0.013 * kgs - 0.007 * age - 0.004 * avg_bpm) + 1.307)
-mpp = Q * rob
+mpp = q * rob
 
 sp = int(mpp + 3 / 2 * pp)
 dp = int(mpp - pp / 3)
