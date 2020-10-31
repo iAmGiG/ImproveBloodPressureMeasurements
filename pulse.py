@@ -30,6 +30,7 @@ class Window(qt.QMainWindow):
             action.setShortcut(shortcut)
             action.triggered.connect(cb)
             menu.addAction(action)
+
         menu = self.menuBar()
         fileMenu = menu.addMenu('Source')
         camMenu = fileMenu.addMenu('Camera')
@@ -102,7 +103,3 @@ def pulse():
     win = Window()
     win.show()
     util.run()
-
-
-# if __name__ == '__main__':
-#     main()

@@ -49,7 +49,7 @@ class CurveWidget(qt.QSplitter):
         self.setMinimumHeight(640)
         self.image = None
         self.plots = [Plot(title=t) for t in (
-                'Signal', 'Filtered', 'Spectrum', 'BPM')]
+                'Signal', 'Filtered', 'Spectrum', 'BPM', "Blood Pressure")]
         for plot in self.plots:
             self.addWidget(plot)
 
@@ -59,7 +59,7 @@ class CurveWidget(qt.QSplitter):
         """
         for plot in self.plots:
             plot.clear()
-        raw, filtered, spectrum, bpm = self.plots
+        raw, filtered, spectrum, bpm, blood_pressure = self.plots
         for person in persons:
             raw.plot(person.corrected)
         for person in persons:
@@ -69,3 +69,5 @@ class CurveWidget(qt.QSplitter):
         for person in persons:
             bpm.plot(person.bpm)
             bpm.plot(person.avBpm, pen=qt.Qt.red)
+        for person in persons:
+            blood_pressure.plot(person.blood_pressure)
