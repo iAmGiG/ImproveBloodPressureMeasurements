@@ -121,21 +121,11 @@ class Window(qt.QMainWindow):
         scene = self.video | FaceTracker | SceneAnalyzer
         lastScene = scene.aiter(skip_to_last=True)
         async for frame, persons in lastScene:
-            # sp, dp = self.bloodPressureCalculator(persons.avBpm)
-            kgs = self.pweight * 0.45359237  # lbs to kgs
-            cm = self.pheight / 0.39370  # in to cm
-            q = 4.5  # constant
-
-            rob = 18.5
-            et = (364.5 - 1.23 * persons.avBpm)
-            bsa = 0.007184 * (kgs ** 0.425) * (cm ** 0.725)
-            sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * persons.avBpm) + (40.4 * bsa) - (0.51 * self.age))
-            pp = sv / ((0.013 * kgs - 0.007 * self.age - 0.004 * persons.avBpm) + 1.307)
-            mpp = q * rob
-
-            sp = int(mpp + 3 / 2 * pp)
-            dp = int(mpp - pp / 3)
-            persons.set_sp_dp(sp, dp)
+            if persons.avBpm:
+                sp, dp = self.bloodPressureCalculator(persons.avBpm)
+                persons.set_sp_dp(sp, dp)
+            else:
+                continue
             self.view.draw(frame.image, persons)
             if self.curves.isVisible():
                 self.curves.plot(persons)
