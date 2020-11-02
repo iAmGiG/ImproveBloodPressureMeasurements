@@ -32,5 +32,5 @@ class SceneAnalyzer(Op):
 
         greenIm = frame.image[:, :, 1]
         for person in self.persons:
-            person.analyze_us(frame.time, greenIm)
+            person.analyze_bp(frame.time, greenIm)
         self.emit(frame, self.persons)
