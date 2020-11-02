@@ -28,8 +28,10 @@ class View(qt.QWidget):
                 p.setFont(font)
                 p.setPen(qt.QColor(255, 255, 255))
                 bpm = person.bpm[-1] if len(person.bpm) else 0
+                sp = person.sp[-1] if len(person.sp) else 0
+                dp = person.dp[-1] if len(person.dp) else 0
                 p.drawText(
-                    x, y, w, h, qt.Qt.AlignHCenter, '♡' + str(int(bpm)))
+                    x, y, w, h, qt.Qt.AlignHCenter, '♡' + str(int(bpm)), str(int(sp)), str(int(dp)))
         self.image = qim
         self.setMinimumSize(qim.size())
         self.update()
