@@ -122,7 +122,7 @@ class Window(qt.QMainWindow):
         lastScene = scene.aiter(skip_to_last=True)
         async for frame, persons in lastScene:
             sp, dp = self.bloodPressureCalculator(persons.avBpm[-1])
-            persons.set_sp_dp(sp, dp)
+            persons.append_lastest_sp_dp(sp, dp)
             self.view.draw(frame.image, persons)
             if self.curves.isVisible():
                 self.curves.plot(persons)

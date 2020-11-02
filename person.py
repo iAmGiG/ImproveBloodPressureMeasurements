@@ -24,8 +24,8 @@ class Person:
         self.freqs = []              # frequencies in bpm
         self._firstTime = 0.0
         self._index = 0
-        self.sp = 0.0
-        self.dp = 0.0
+        self.sp = array('d')
+        self.dp = array('d')
 
     def setFace(self, face):
         """
@@ -34,12 +34,12 @@ class Person:
         self.prevFace = self.face
         self.face = face
 
-    def set_sp_dp(self, sp, dp):
+    def append_lastest_sp_dp(self, sp, dp):
         """
         Sets the blood pressure formats.
         """
-        self.sp = sp
-        self.dp = dp
+        self.sp.append(sp)
+        self.dp.append(dp)
 
     def contains(self, x, y):
         """
