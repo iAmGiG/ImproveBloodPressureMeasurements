@@ -4,16 +4,29 @@ import numpy as np
 from heartwave.person import Person as P
 import conf
 
-class Person_us (P):
+
+class Person_us(P):
     """
     State and heart rate calculations for one person.
     """
+
     def __init__(self, face):
         super().__init__(face)
         self.sp = array('d')
         self.dp = array('d')
         self.avg_sp = array('d')
         self.avg_dp = array('d')
+        self.height = 0.0
+        self.weight = 0.0
+        self.age = 0
+
+    def set_boiler_plate(self, weight, height, age):
+        """
+        Sets the boiler plat params for the bp function. returns nothing
+        """
+        self.height = height
+        self.weight = weight
+        self.age = age
 
     def analyze_bp(self, t, greenIm):
         # P.analyze(self, t, greenIm)
@@ -46,9 +59,7 @@ class Person_us (P):
             self.filtered, nyquistFreq)
         bpm = self._findPeak(self.freqs, self.spectrum)
         if conf.MIN_BPM <= bpm <= conf.MAX_BPM:
-            sp, dp = self._blood_preasure_calculator(bpm, 330, 73, 39)
-            self.sp.append(sp)
-            self.dp.append(dp)
+            self.blood_pressure_calculator(bpm)
             self.bpm.append(bpm)
             self._index += 1
             if fps:
@@ -59,21 +70,27 @@ class Person_us (P):
                     self.avg_sp.append(sp)
                     self.avg_dp.append(dp)
 
-
-    def _blood_preasure_calculator(self, avg_bpm, weight, height, age):
-
-        kgs = weight * 0.45359237  # lbs to kgs
-        cm = height / 0.39370  # in to cm
+    def blood_pressure_calculator(self, avg_bpm):
+        """
+        Completes the calculation for the forms of blood pressure.
+        params: avg_bpm: is the average beats per minute
+        sp:
+        dp:
+        returns: sp, dp
+        """
+        kgs = self.weight * 0.45359237  # lbs to kgs
+        cm = self.height / 0.39370  # in to cm
         q = 4.5  # constant
 
         rob = 18.5
         et = (364.5 - 1.23 * avg_bpm)
         bsa = 0.007184 * (kgs ** 0.425) * (cm ** 0.725)
-        sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * avg_bpm) + (40.4 * bsa) - (0.51 * age))
-        pp = sv / ((0.013 * kgs - 0.007 * age - 0.004 * avg_bpm) + 1.307)
+        sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * avg_bpm) + (40.4 * bsa) - (0.51 * self.age))
+        pp = sv / ((0.013 * kgs - 0.007 * self.age - 0.004 * avg_bpm) + 1.307)
         mpp = q * rob
 
         sp = int(mpp + 3 / 2 * pp)
         dp = int(mpp - pp / 3)
 
-        return sp, dp
+        self.sp.append(sp)
+        self.dp.append(dp)
