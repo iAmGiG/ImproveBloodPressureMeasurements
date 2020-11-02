@@ -67,8 +67,8 @@ class Person_us(P):
                 if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
                     av = np.average(self.bpm[-p:])
                     self.avBpm.append(av)
-                    self.avg_sp.append(sp)
-                    self.avg_dp.append(dp)
+                    self.avg_sp.append(self.sp[-p:])
+                    self.avg_dp.append(self.dp[-p:])
 
     def blood_pressure_calculator(self, avg_bpm):
         """
@@ -89,8 +89,5 @@ class Person_us(P):
         pp = sv / ((0.013 * kgs - 0.007 * self.age - 0.004 * avg_bpm) + 1.307)
         mpp = q * rob
 
-        sp = int(mpp + 3 / 2 * pp)
-        dp = int(mpp - pp / 3)
-
-        self.sp.append(sp)
-        self.dp.append(dp)
+        self.sp.append(int(mpp + 3 / 2 * pp))
+        self.dp.append(int(mpp - pp / 3))
