@@ -2,7 +2,6 @@ from array import array
 
 import numpy as np
 from heartwave.person import Person as P
-#import heartwave.conf as conf
 import conf
 
 class Person_us (P):
