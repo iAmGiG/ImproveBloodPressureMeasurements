@@ -10,20 +10,55 @@ class Person_us (P):
     State and heart rate calculations for one person.
     """
     def __init__(self, face):
-        P.__init__(self, face)
+        super().__init__(face)
         self.sp = array('d')
         self.dp = array('d')
+        self.avg_sp = array('d')
+        self.avg_dp = array('d')
 
-    def analyze_us(self, t, greenIm):
-        P.analyze(self, t, greenIm)
+    def analyze_bp(self, t, greenIm):
+        # P.analyze(self, t, greenIm)
+        if not self._firstTime:
+            self._firstTime = t
+        if t < self._firstTime + conf.STARTUP_TIME:
+            return
+        for arr in (
+                self.times, self.raw, self.corrected, self.bpm, self.avBpm):
+            if len(arr) >= conf.MAX_SAMPLES:
+                arr.pop(0)
+
+        self.times.append(t)
+        raw = self._getSignal(greenIm, self.face)
+        self.raw.append(raw)
+
+        if self.prevFace is not None:
+            prev = self._getSignal(greenIm, self.prevFace)
+            self.correction *= prev / raw
+            self.prevFace = None
+        self.corrected.append(raw * self.correction)
+
         fps = self._getFPS()
-        if fps:
-            p = int(0.5 + conf.AV_BPM_PERIOD * fps)
-            if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
-                av = np.average(self.bpm[-p:])
-                sp, dp = self._blood_preasure_calculator(av, 330, 73, 39)
-                self.sp.append(sp)
-                self.dp.append(dp)
+        nyquistFreq = 0.5 * fps
+        self.filtered = self._filter(self.corrected, nyquistFreq)
+        if not len(self.filtered):
+            return
+
+        self.freqs, self.spectrum = self._createSpectrum(
+            self.filtered, nyquistFreq)
+        bpm = self._findPeak(self.freqs, self.spectrum)
+        if conf.MIN_BPM <= bpm <= conf.MAX_BPM:
+            sp, dp = self._blood_preasure_calculator(bpm, 330, 73, 39)
+            self.sp.append(sp)
+            self.dp.append(dp)
+            self.bpm.append(bpm)
+            self._index += 1
+            if fps:
+                p = int(0.5 + conf.AV_BPM_PERIOD * fps)
+                if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
+                    av = np.average(self.bpm[-p:])
+                    self.avBpm.append(av)
+                    self.avg_sp.append(sp)
+                    self.avg_dp.append(dp)
 
 
     def _blood_preasure_calculator(self, avg_bpm, weight, height, age):
