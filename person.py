@@ -10,22 +10,31 @@ class Person:
     """
     State and heart rate calculations for one person.
     """
+
     def __init__(self, face):
-        self.face = face             # face region
-        self.prevFace = None         # previous face region
-        self.correction = 1.0        # correction for switching face regions
-        self.times = array('d')      # sample times
-        self.raw = array('d')        # spatial-averaged raw sensor samples
+        self.face = face  # face region
+        self.prevFace = None  # previous face region
+        self.correction = 1.0  # correction for switching face regions
+        self.times = array('d')  # sample times
+        self.raw = array('d')  # spatial-averaged raw sensor samples
         self.corrected = array('d')  # raw values corrected for ROI changes
-        self.filtered = array('d')   # bandpass filtered
-        self.bpm = array('d')        # beats per minute
-        self.avBpm = array('d')      # slow running average of beats per minute
-        self.spectrum = []           # spectral power
-        self.freqs = []              # frequencies in bpm
+        self.filtered = array('d')  # bandpass filtered
+        self.bpm = array('d')  # beats per minute
+        self.avBpm = array('d')  # slow running average of beats per minute
+        self.spectrum = []  # spectral power
+        self.freqs = []  # frequencies in bpm
         self._firstTime = 0.0
         self._index = 0
         self.sp = array('d')
         self.dp = array('d')
+        self.pheight = 0.0
+        self.pweight = 0.0
+        self.age = 0
+
+    def setBoilerPlate(self, weight, height, age):
+        self.pheight = height
+        self.pweight = weight
+        self.age = age
 
     def setFace(self, face):
         """
@@ -47,6 +56,26 @@ class Person:
         """
         xf, yf, wf, hf = self.face
         return xf <= x <= xf + wf and yf <= y <= yf + hf
+
+    def bloodPressureCalculator(self, avg_bpm):
+        """
+        returns sp, dp
+        """
+        kgs = self.pweight * 0.45359237  # lbs to kgs
+        cm = self.pheight / 0.39370  # in to cm
+        q = 4.5  # constant
+
+        rob = 18.5
+        et = (364.5 - 1.23 * avg_bpm)
+        bsa = 0.007184 * (kgs ** 0.425) * (cm ** 0.725)
+        sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * avg_bpm) + (40.4 * bsa) - (0.51 * self.age))
+        pp = sv / ((0.013 * kgs - 0.007 * self.age - 0.004 * avg_bpm) + 1.307)
+        mpp = q * rob
+
+        self.sp.append(int(mpp + 3 / 2 * pp))
+        self.dp.append(int(mpp - pp / 3))
+
+        # return sp, dp
 
     def analyze(self, t, greenIm):
         """
@@ -87,6 +116,7 @@ class Person:
                 p = int(0.5 + conf.AV_BPM_PERIOD * fps)
                 if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
                     av = np.average(self.bpm[-p:])
+                    self.bloodPressureCalculator(av)
                     self.avBpm.append(av)
 
     def _getSignal(self, greenIm, face):

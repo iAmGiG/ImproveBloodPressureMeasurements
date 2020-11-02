@@ -26,9 +26,6 @@ class Window(qt.QMainWindow):
         self.setCentralWidget(self.view)
         self.curves = CurveWidget()
         self.curves.show()
-        self.pheight = 0.0
-        self.pweight = 0.0
-        self.age = 0
 
         def addAction(menu, name, shortcut, cb):
             action = qt.QAction(name, self)
@@ -91,38 +88,11 @@ class Window(qt.QMainWindow):
     def stop(self):
         self.video.stop()
 
-    def setBoilerPlate(self, weight, height, age):
-        self.pheight = height
-        self.pweight = weight
-        self.age = age
-
-    def bloodPressureCalculator(self, avg_bpm):
-        """
-        returns sp, dp
-        """
-        kgs = self.pweight * 0.45359237  # lbs to kgs
-        cm = self.pheight / 0.39370  # in to cm
-        q = 4.5  # constant
-
-        rob = 18.5
-        et = (364.5 - 1.23 * avg_bpm)
-        bsa = 0.007184 * (kgs ** 0.425) * (cm ** 0.725)
-        sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * avg_bpm) + (40.4 * bsa) - (0.51 * self.age))
-        pp = sv / ((0.013 * kgs - 0.007 * self.age - 0.004 * avg_bpm) + 1.307)
-        mpp = q * rob
-
-        sp = int(mpp + 3 / 2 * pp)
-        dp = int(mpp - pp / 3)
-
-        return sp, dp
-
     async def pipeline(self):
         self.video = VideoStream(conf.CAM_ID)
         scene = self.video | FaceTracker | SceneAnalyzer
         lastScene = scene.aiter(skip_to_last=True)
         async for frame, persons in lastScene:
-            sp, dp = self.bloodPressureCalculator(persons.avBpm[-1])
-            persons.append_lastest_sp_dp(sp, dp)
             self.view.draw(frame.image, persons)
             if self.curves.isVisible():
                 self.curves.plot(persons)

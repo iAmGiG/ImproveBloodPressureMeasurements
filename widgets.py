@@ -71,4 +71,4 @@ class CurveWidget(qt.QSplitter):
             bpm.plot(person.avBpm, pen=qt.Qt.red)
         for person in persons:
             bp_sp.plot(person.sp)
-            bp_dp.plot(person.dp)
+            bp_dp.plot(person.dp, pen=qt.Qt.blue)
