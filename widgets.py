@@ -4,7 +4,7 @@ from heartwave.plot import Plot
 
 class View_us(View):
     def __init__(self, parent):
-            View.__init__(self, parent)
+            super().__init__(parent)
 
 
 class CurveWidget_bp(CurveWidget):
