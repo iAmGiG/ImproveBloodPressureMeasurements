@@ -17,7 +17,7 @@ import util
 class Window(qt.QMainWindow):
 
     def __init__(self):
-        qt.QMainWindow.__init__(self)
+        super().__init__()
         self.setWindowTitle('Our app')
         self.view = View_us(self)
         self.view.setMinimumSize(640, 480)
