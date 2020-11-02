@@ -26,6 +26,9 @@ class Window(qt.QMainWindow):
         self.setCentralWidget(self.view)
         self.curves = CurveWidget()
         self.curves.show()
+        self.pheight = 0.0
+        self.pweight = 0.0
+        self.age = 0
 
         def addAction(menu, name, shortcut, cb):
             action = qt.QAction(name, self)
@@ -88,11 +91,17 @@ class Window(qt.QMainWindow):
     def stop(self):
         self.video.stop()
 
+    def setBoilerPlate(self, weight, height, age):
+        self.pheight = height
+        self.pweight = weight
+        self.age = age
+
     async def pipeline(self):
         self.video = VideoStream(conf.CAM_ID)
         scene = self.video | FaceTracker | SceneAnalyzer
         lastScene = scene.aiter(skip_to_last=True)
         async for frame, persons in lastScene:
+            persons.setBoilerPlate(self.pweight, self.pweight, self.age)
             self.view.draw(frame.image, persons)
             if self.curves.isVisible():
                 self.curves.plot(persons)
