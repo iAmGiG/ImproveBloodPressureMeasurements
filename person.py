@@ -5,7 +5,7 @@ from heartwave.person import Person as P
 #import heartwave.conf as conf
 import conf
 
-class Person (P):
+class Person_us (P):
     """
     State and heart rate calculations for one person.
     """
