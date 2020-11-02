@@ -17,7 +17,7 @@ class View_us(View):
                 p.drawRect(x, y, w, h / 4)
                 p.drawRect(x, y + h / 2, w, h / 4)
                 font = p.font()
-                font.setPixelSize(28)
+                font.setPixelSize(18)
                 p.setFont(font)
                 p.setPen(qt.QColor(255, 255, 255))
                 bpm = person.avBpm[-1] if len(person.avBpm) else 0
