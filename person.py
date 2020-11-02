@@ -65,10 +65,9 @@ class Person_us(P):
             if fps:
                 p = int(0.5 + conf.AV_BPM_PERIOD * fps)
                 if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
-                    av = np.average(self.bpm[-p:])
-                    self.avBpm.append(av)
-                    self.avg_sp.append(self.sp[-p:])
-                    self.avg_dp.append(self.dp[-p:])
+                    self.avBpm.append(np.average(self.bpm[-p:]))
+                    self.avg_sp.append(np.average(self.sp[-p:]))
+                    self.avg_dp.append(np.average(self.dp[-p:]))
 
     def blood_pressure_calculator(self, avg_bpm):
         """
