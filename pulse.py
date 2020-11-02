@@ -6,17 +6,11 @@ from pathlib import Path
 
 import PyQt5.Qt as qt
 
-#from heartwave.widgets import View, CurveWidget
 from widgets import View_us, CurveWidget_bp
-#from heartwave.videostream import VideoStream
 from videostream import VideoStream
-#from heartwave.facetracker import FaceTracker
 from facetracker import FaceTracker
-#from heartwave.sceneanalyzer import SceneAnalyzer
 from sceneanalyzer import SceneAnalyzer
-#import heartwave.conf as conf
 import conf
-#import heartwave.util as util
 import util
 
 
