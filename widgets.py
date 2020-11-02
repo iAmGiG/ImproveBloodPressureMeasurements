@@ -21,8 +21,13 @@ class View_us(View):
                 p.setFont(font)
                 p.setPen(qt.QColor(255, 255, 255))
                 bpm = person.avBpm[-1] if len(person.avBpm) else 0
+                sp = person.avg_sp[-1] if len(person.avg_sp) else 0
+                dp = person.avg_dp[-1] if len(person.avg_dp) else 0
+                bp = "{}/{}".format(str(int(sp)), str(int(dp)))
                 p.drawText(
                     x, y, w, h, qt.Qt.AlignHCenter, '♡' + str(int(bpm)))
+                p.drawText(
+                    x, y + h / 2, w, h / 4, qt.Qt.AlignHCenter, bp)
         self.image = qim
         self.setMinimumSize(qim.size())
         self.update()
