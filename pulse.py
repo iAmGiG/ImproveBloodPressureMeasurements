@@ -7,7 +7,7 @@ from pathlib import Path
 import PyQt5.Qt as qt
 
 #from heartwave.widgets import View, CurveWidget
-from widgets import View_us, CurveWidget_us
+from widgets import View_us, CurveWidget_bp
 #from heartwave.videostream import VideoStream
 from videostream import VideoStream
 #from heartwave.facetracker import FaceTracker
@@ -28,7 +28,7 @@ class Window(qt.QMainWindow):
         self.view = View_us(self)
         self.view.setMinimumSize(640, 480)
         self.setCentralWidget(self.view)
-        self.curves = CurveWidget_us()
+        self.curves = CurveWidget_bp()
         self.curves.show()
 
         def addAction(menu, name, shortcut, cb):
