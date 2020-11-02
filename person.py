@@ -59,15 +59,19 @@ class Person_us(P):
             self.filtered, nyquistFreq)
         bpm = self._findPeak(self.freqs, self.spectrum)
         if conf.MIN_BPM <= bpm <= conf.MAX_BPM:
-            self.blood_pressure_calculator(bpm)
+            sp, dp = self.blood_pressure_calculator(bpm)
+            self.sp.append(sp)
+            self.dp.append(dp)
             self.bpm.append(bpm)
             self._index += 1
             if fps:
                 p = int(0.5 + conf.AV_BPM_PERIOD * fps)
                 if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
                     self.avBpm.append(np.average(self.bpm[-p:]))
-                    self.avg_sp.append(np.average(self.sp[-p:]))
-                    self.avg_dp.append(np.average(self.dp[-p:]))
+                    self.avg_sp.append(sp)
+                    self.avg_dp.append(dp)
+                    # self.avg_sp.append(np.average(self.sp[-p:]))
+                    # self.avg_dp.append(np.average(self.dp[-p:]))
 
     def blood_pressure_calculator(self, avg_bpm):
         """
@@ -88,5 +92,4 @@ class Person_us(P):
         pp = sv / ((0.013 * kgs - 0.007 * self.age - 0.004 * avg_bpm) + 1.307)
         mpp = q * rob
 
-        self.sp.append(int(mpp + 3 / 2 * pp))
-        self.dp.append(int(mpp - pp / 3))
+        return int(mpp + 3 / 2 * pp), int(mpp - pp / 3)
