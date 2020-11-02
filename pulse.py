@@ -130,9 +130,9 @@ def pulse():
         conf.CAM_ID = sys.argv[1]
     qApp = qt.QApplication(sys.argv)  # noqa
     win = Window()
-    weight, ok = qt.QInputDialog.getDouble(title="Insert Weight", label="""weight in pounds""")
-    height, ok = qt.QInputDialog.getDouble(title="Insert Height", label="""height """)
-    age, ok = qt.QInputDialog.getInt(title="insert your age", label="""age testing:""")
+    weight, ok = qt.QInputDialog.getDouble(None, "Insert Weight", """weight in pounds""")
+    height, ok = qt.QInputDialog.getDouble(None, "Insert Height", """height """)
+    age, ok = qt.QInputDialog.getInt(None, "insert your age", """age testing:""")
     if not ok:
         sys.exit(qApp.exec_())
     win.setBoilerPlate(weight=weight, height=height, age=age)
