@@ -102,7 +102,3 @@ def pulse():
     win = Window()
     win.show()
     util.run()
-
-
-# if __name__ == '__main__':
-#     main()
