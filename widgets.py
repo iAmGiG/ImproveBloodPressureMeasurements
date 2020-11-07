@@ -1,14 +1,25 @@
-from heartwave.widgets import View, CurveWidget
-from heartwave.plot import Plot
-import heartwave.util as util
 import PyQt5.Qt as qt
+import PyQt5.Qt as qt
+from plot import Plot
+from plot import Plot
+import util as util
+import util as util
+from widgets import View, CurveWidget
 
 
-class View_us(View):
+class View(qt.QWidget):
+    """
+    Video canvas with overlay.
+    """
+
     def __init__(self, parent):
-            super().__init__(parent)
+        qt.QWidget.__init__(self, parent)
+        self.image = None
 
     def draw(self, im, persons):
+        """
+        Display the CV2 image with overlay from the analysed persons.
+        """
         qim = util.qImage(im)
         with qt.QPainter(qim) as p:
             for person in persons:
@@ -32,24 +43,45 @@ class View_us(View):
         self.setMinimumSize(qim.size())
         self.update()
 
+    def paintEvent(self, ev):
+        if self.image:
+            with qt.QPainter(self) as p:
+                p.drawImage(0, 0, self.image)
 
-class CurveWidget_bp(CurveWidget):
+
+class CurveWidget(qt.QSplitter):
+    """
+    Realtime curves.
+    """
+
     def __init__(self, parent=None):
-        super().__init__(parent)
+        qt.QSplitter.__init__(self, qt.Qt.Vertical, parent=parent)
         self.setMinimumHeight(640)
         self.image = None
+        self.plots = [Plot(title=t) for t in (
+            'Signal', 'Filtered', 'Spectrum', 'BPM', "Blood Pressure Sp", "Blood Pressure Dp")]
+        for plot in self.plots:
+
         self.bp_plots = [Plot(title=t) for t in ('SP', 'DP')]
         for plot in self.bp_plots:
             self.addWidget(plot)
 
     def plot(self, persons):
-        super().plot(persons)
-        for plot in self.bp_plots:
+        """
+        Update plots with newest data from the persons.
+        """
+        for plot in self.plots:
             plot.clear()
-        sp, dp = self.bp_plots
+        raw, filtered, spectrum, bpm, bp_sp, bp_dp = self.plots
         for person in persons:
-            sp.plot(person.sp)
-            sp.plot(person.avg_sp, pen=qt.Qt.red)
+            raw.plot(person.corrected)
         for person in persons:
-            dp.plot(person.dp)
-            dp.plot(person.avg_dp, pen=qt.Qt.red)
+            filtered.plot(person.filtered)
+        for person in persons:
+            spectrum.plot(person.spectrum, x=person.freqs)
+        for person in persons:
+            bpm.plot(person.bpm)
+            bpm.plot(person.avBpm, pen=qt.Qt.red)
+        for person in persons:
+            bp_sp.plot(person.sp)
+            bp_dp.plot(person.dp, pen=qt.Qt.blue)

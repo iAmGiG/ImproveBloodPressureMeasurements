@@ -1,5 +1,6 @@
-#from heartwave.person import Person
-from person import Person_us
+import sys
+from person import Person
+
 from eventkit import Op
 
 
@@ -25,12 +26,12 @@ class SceneAnalyzer(Op):
             if person:
                 person.setFace(face)
             else:
-                person = Person_us(face)
+                person = Person(face)
                 self.persons.append(person)
             present.add(person)
         self.persons = [p for p in self.persons if p in present]
 
         greenIm = frame.image[:, :, 1]
         for person in self.persons:
-            person.analyze_bp(frame.time, greenIm)
+            person.analyze(frame.time, greenIm)
         self.emit(frame, self.persons)
