@@ -26,9 +26,12 @@ class Window(qt.QMainWindow):
         self.setCentralWidget(self.view)
         self.curves = CurveWidget()
         self.curves.show()
-        self.pheight = 0.0
-        self.pweight = 0.0
-        self.age = 0
+        self.pheight, ok = qt.QInputDialog.getDouble(self.view, "Insert Weight", """weight in pounds""")
+        self.pweight, ok = qt.QInputDialog.getDouble(self.view, "Insert Height", """height """)
+        self.age, ok = qt.QInputDialog.getInt(self.view, "insert your age", """age testing:""")
+
+        if not ok:
+            sys.exit(qt.qApp.exec_())
 
         def addAction(menu, name, shortcut, cb):
             action = qt.QAction(name, self)
@@ -91,11 +94,6 @@ class Window(qt.QMainWindow):
     def stop(self):
         self.video.stop()
 
-    def setBoilerPlate(self, weight, height, age):
-        self.pheight = height
-        self.pweight = weight
-        self.age = age
-
     async def pipeline(self):
         self.video = VideoStream(conf.CAM_ID)
         scene = self.video | FaceTracker | SceneAnalyzer
@@ -112,11 +110,5 @@ def pulse():
         conf.CAM_ID = sys.argv[1]
     qApp = qt.QApplication(sys.argv)  # noqa
     win = Window()
-    weight, ok = qt.QInputDialog.getDouble(None, "Insert Weight", """weight in pounds""")
-    height, ok = qt.QInputDialog.getDouble(None, "Insert Height", """height """)
-    age, ok = qt.QInputDialog.getInt(None, "insert your age", """age testing:""")
-    if not ok:
-        sys.exit(qApp.exec_())
-    win.setBoilerPlate(weight=weight, height=height, age=age)
     win.show()
     util.run()

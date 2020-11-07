@@ -1,10 +1,10 @@
 import os
 import cv2
 import numpy as np
-
+import sys
 from eventkit import Op
 
-import heartwave.conf as conf
+import conf as conf
 
 
 class FaceTracker(Op):

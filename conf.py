@@ -10,7 +10,7 @@ FACE_DETECT_PAUSE = 1.0
 FACE_TRACKING_TIMEOUT = 5
 
 # allow user settings to override the standard settings
-path = Path.home() / '.heartwave.conf'
+path = Path.home() / '.ImproveBloodPressureMeasurements.conf'
 if path.is_file():
     with open(path) as f:
         code = f.read()

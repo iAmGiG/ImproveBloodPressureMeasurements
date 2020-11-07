@@ -1,7 +1,7 @@
 import PyQt5.Qt as qt
 
-from heartwave.plot import Plot
-import heartwave.util as util
+from plot import Plot
+import util as util
 
 
 class View(qt.QWidget):
