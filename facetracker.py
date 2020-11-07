@@ -1,10 +1,10 @@
 import os
 import cv2
 import numpy as np
-
+import sys
 from eventkit import Op
 
-import heartwave.conf as conf
+import conf as conf
 
 
 class FaceTracker(Op):
@@ -17,7 +17,7 @@ class FaceTracker(Op):
         Op.__init__(self, source)
         path = os.path.join(
             os.path.dirname(__file__),
-            '../ImproveBloodPressureMeasurements/data', 'lbpcascade_frontalface_improved.xml')
+            'data', 'lbpcascade_frontalface_improved.xml')
         self.classifier = cv2.CascadeClassifier(path)
         self.trackers = []
         self.t0 = 0.0
