@@ -1,19 +1,15 @@
-import sys
-import asyncio
-import functools
-import datetime
-from pathlib import Path
-
 import PyQt5.Qt as qt
-
-from widgets import View, CurveWidget
-from heartwave.videostream import VideoStream
-# from heartwave.facetracker import FaceTracker
+import asyncio
+import conf as conf
+import datetime
 from facetracker import FaceTracker
-# from heartwave.sceneanalyzer import SceneAnalyzer
+import functools
+from pathlib import Path
 from sceneanalyzer import SceneAnalyzer
-import heartwave.conf as conf
-import heartwave.util as util
+import sys
+import util as util
+from videostream import VideoStream
+from widgets import View, CurveWidget
 
 
 class Window(qt.QMainWindow):
