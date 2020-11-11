@@ -1,4 +1,5 @@
 from array import array
+import pulse as pop
 
 import numpy as np
 from heartwave.person import Person as P
@@ -14,6 +15,8 @@ class Person_us (P):
         self.dp = array('d')
         self.avg_sp = array('d')
         self.avg_dp = array('d')
+        win = pop.Popup()
+        self.height, self.weight, self.age = win.collect_user_data()
 
     def analyze_bp(self, t, greenIm):
         # P.analyze(self, t, greenIm)
@@ -46,7 +49,7 @@ class Person_us (P):
             self.filtered, nyquistFreq)
         bpm = self._findPeak(self.freqs, self.spectrum)
         if conf.MIN_BPM <= bpm <= conf.MAX_BPM:
-            sp, dp = self._blood_preasure_calculator(bpm, 330, 73, 39)
+            sp, dp = self._blood_preasure_calculator(bpm, self.weight, self.height, self.age)
             self.sp.append(sp)
             self.dp.append(dp)
             self.bpm.append(bpm)
