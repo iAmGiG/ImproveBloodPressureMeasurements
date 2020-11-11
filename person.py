@@ -1,21 +1,35 @@
 from array import array
-import pulse as pop
-
 import numpy as np
 from heartwave.person import Person as P
 import conf
+import PyQt5.Qt as qt
 
-class Person_us (P):
+
+class Popup(qt.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.view = View_us(self)
+        self.view.setMinimumSize(640, 480)
+
+    def collect_user_data(self):
+        pweight, ok = qt.QInputDialog.getDouble(self.view, "Insert Weight", """weight in pounds""")
+        pheight, ok = qt.QInputDialog.getDouble(self.view, "Insert Height", """height """)
+        page, ok = qt.QInputDialog.getInt(self.view, "insert your age", """age testing:""")
+        return pheight, pweight, page
+
+
+class Person_us(P):
     """
     State and heart rate calculations for one person.
     """
+
     def __init__(self, face):
         super().__init__(face)
         self.sp = array('d')
         self.dp = array('d')
         self.avg_sp = array('d')
         self.avg_dp = array('d')
-        win = pop.Popup()
+        win = Popup()
         self.height, self.weight, self.age = win.collect_user_data()
 
     def analyze_bp(self, t, greenIm):
@@ -61,7 +75,6 @@ class Person_us (P):
                     self.avBpm.append(av)
                     self.avg_sp.append(sp)
                     self.avg_dp.append(dp)
-
 
     def _blood_preasure_calculator(self, avg_bpm, weight, height, age):
 
