@@ -45,12 +45,6 @@ class Window(qt.QMainWindow):
         self.video = None
         self.start()
 
-    def collect_user_data(self):
-        pheight, ok = qt.QInputDialog.getDouble(self.view, "Insert Weight", """weight in pounds""")
-        pweight, ok = qt.QInputDialog.getDouble(self.view, "Insert Height", """height """)
-        page, ok = qt.QInputDialog.getInt(self.view, "insert your age", """age testing:""")
-        return pheight, pweight, page
-
     def onOpenFile(self):
         path, _filter = qt.QFileDialog.getOpenFileName(self)
         if path:
