@@ -29,8 +29,8 @@ class Person_us(P):
         self.dp = array('d')
         self.avg_sp = array('d')
         self.avg_dp = array('d')
-        win = Popup()
-        self.height, self.weight, self.age = win.collect_user_data()
+        popup = Popup()
+        self.height, self.weight, self.age = popup.collect_user_data()
 
     def analyze_bp(self, t, greenIm):
         # P.analyze(self, t, greenIm)
@@ -63,7 +63,7 @@ class Person_us(P):
             self.filtered, nyquistFreq)
         bpm = self._findPeak(self.freqs, self.spectrum)
         if conf.MIN_BPM <= bpm <= conf.MAX_BPM:
-            sp, dp = self._blood_preasure_calculator(bpm, self.weight, self.height, self.age)
+            sp, dp = self._blood_preasure_calculator(bpm)
             self.sp.append(sp)
             self.dp.append(dp)
             self.bpm.append(bpm)
@@ -76,7 +76,7 @@ class Person_us(P):
                     self.avg_sp.append(sp)
                     self.avg_dp.append(dp)
 
-    def _blood_preasure_calculator(self, avg_bpm, weight, height, age):
+    def _blood_pressure_calculator(self, avg_bpm, weight=self.weight, height=self.height, age=self.age):
 
         kgs = weight * 0.45359237  # lbs to kgs
         cm = height / 0.39370  # in to cm
