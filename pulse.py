@@ -45,6 +45,12 @@ class Window(qt.QMainWindow):
         self.video = None
         self.start()
 
+    def collect_user_data(self):
+        pheight, ok = qt.QInputDialog.getDouble(self.view, "Insert Weight", """weight in pounds""")
+        pweight, ok = qt.QInputDialog.getDouble(self.view, "Insert Height", """height """)
+        page, ok = qt.QInputDialog.getInt(self.view, "insert your age", """age testing:""")
+        return pheight, pweight, page
+
     def onOpenFile(self):
         path, _filter = qt.QFileDialog.getOpenFileName(self)
         if path:
@@ -94,6 +100,17 @@ class Window(qt.QMainWindow):
             if self.curves.isVisible():
                 self.curves.plot(persons)
 
+class Popup(qt.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.view = View_us(self)
+        self.view.setMinimumSize(640, 480)
+
+    def collect_user_data(self):
+        pweight, ok = qt.QInputDialog.getDouble(self.view, "Insert Weight", """weight in pounds""")
+        pheight, ok = qt.QInputDialog.getDouble(self.view, "Insert Height", """height """)
+        page, ok = qt.QInputDialog.getInt(self.view, "insert your age", """age testing:""")
+        return pheight, pweight, page
 
 def pulse():
     if len(sys.argv) > 1:
