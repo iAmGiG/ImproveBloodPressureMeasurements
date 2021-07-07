@@ -1,4 +1,5 @@
-from heartwave.person import Person
+import sys
+from person import Person
 
 from eventkit import Op
 

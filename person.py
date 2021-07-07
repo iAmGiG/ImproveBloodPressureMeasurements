@@ -1,29 +1,42 @@
+import sys
 from array import array
-
 import numpy as np
 from scipy.signal import butter, filtfilt
 
-import heartwave.conf as conf
+import conf as conf
 
 
 class Person:
     """
     State and heart rate calculations for one person.
     """
+
     def __init__(self, face):
-        self.face = face             # face region
-        self.prevFace = None         # previous face region
-        self.correction = 1.0        # correction for switching face regions
-        self.times = array('d')      # sample times
-        self.raw = array('d')        # spatial-averaged raw sensor samples
+        self.face = face  # face region
+        self.prevFace = None  # previous face region
+        self.correction = 1.0  # correction for switching face regions
+        self.times = array('d')  # sample times
+        self.raw = array('d')  # spatial-averaged raw sensor samples
         self.corrected = array('d')  # raw values corrected for ROI changes
-        self.filtered = array('d')   # bandpass filtered
-        self.bpm = array('d')        # beats per minute
-        self.avBpm = array('d')      # slow running average of beats per minute
-        self.spectrum = []           # spectral power
-        self.freqs = []              # frequencies in bpm
+        self.filtered = array('d')  # bandpass filtered
+        self.bpm = array('d')  # beats per minute
+        self.avBpm = array('d')  # slow running average of beats per minute
+        self.spectrum = []  # spectral power
+        self.freqs = []  # frequencies in bpm
         self._firstTime = 0.0
         self._index = 0
+        self.sp = array('d')
+        self.dp = array('d')
+        self.avg_sp = array('d')
+        self.avg_dp = array('d')
+        self.pheight = 0.0
+        self.pweight = 0.0
+        self.age = 0
+
+    def setBoilerPlate(self, weight, height, age):
+        self.pheight = height
+        self.pweight = weight
+        self.age = age
 
     def setFace(self, face):
         """
@@ -32,12 +45,57 @@ class Person:
         self.prevFace = self.face
         self.face = face
 
+    def append_lastest_sp_dp(self, sp, dp):
+        """
+        Sets the blood pressure formats.
+        """
+        self.sp.append(sp)
+        self.dp.append(dp)
+
     def contains(self, x, y):
         """
         Does this person's face contain the given point?
         """
         xf, yf, wf, hf = self.face
         return xf <= x <= xf + wf and yf <= y <= yf + hf
+
+    def  _blood_pressure_calculator(self, avg_bpm):
+        """
+        returns sp, dp
+        """
+        kgs = self.pweight * 0.45359237  # lbs to kgs
+        cm = self.pheight / 0.39370  # in to cm
+        q = 4.5  # constant
+
+        rob = 18.5
+        et = (364.5 - 1.23 * avg_bpm)
+        bsa = 0.007184 * (kgs ** 0.425) * (cm ** 0.725)
+        sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * avg_bpm) + (40.4 * bsa) - (0.51 * self.age))
+        pp = sv / ((0.013 * kgs - 0.007 * self.age - 0.004 * avg_bpm) + 1.307)
+        mpp = q * rob
+
+        sp = int(mpp + 3 / 2 * pp)
+        dp = int(mpp - pp / 3)
+
+        return sp, dp
+
+    def _blood_pressure_calculator(self, avg_bpm, weight, height, age):
+
+        kgs = weight * 0.45359237  # lbs to kgs
+        cm = height / 0.39370  # in to cm
+        q = 4.5  # constant
+
+        rob = 18.5
+        et = (364.5 - 1.23 * avg_bpm)
+        bsa = 0.007184 * (kgs ** 0.425) * (cm ** 0.725)
+        sv = (-6.6 + (0.25 * (et - 35)) - (0.62 * avg_bpm) + (40.4 * bsa) - (0.51 * age))
+        pp = sv / ((0.013 * kgs - 0.007 * age - 0.004 * avg_bpm) + 1.307)
+        mpp = q * rob
+
+        sp = int(mpp + 3 / 2 * pp)
+        dp = int(mpp - pp / 3)
+
+        return sp, dp
 
     def analyze(self, t, greenIm):
         """
@@ -72,6 +130,9 @@ class Person:
             self.filtered, nyquistFreq)
         bpm = self._findPeak(self.freqs, self.spectrum)
         if conf.MIN_BPM <= bpm <= conf.MAX_BPM:
+            sp, dp = self._blood_pressure_calculator(bpm)
+            self.sp.append(sp)
+            self.dp.append(dp)
             self.bpm.append(bpm)
             self._index += 1
             if fps:
@@ -79,6 +140,8 @@ class Person:
                 if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
                     av = np.average(self.bpm[-p:])
                     self.avBpm.append(av)
+                    self.avg_sp.append(sp)
+                    self.avg_dp.append(dp)
 
     def _getSignal(self, greenIm, face):
         """

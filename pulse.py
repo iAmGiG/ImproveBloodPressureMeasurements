@@ -1,17 +1,15 @@
-import sys
-import asyncio
-import functools
-import datetime
-from pathlib import Path
-
 import PyQt5.Qt as qt
-
-from heartwave.widgets import View, CurveWidget
-from heartwave.videostream import VideoStream
-from heartwave.facetracker import FaceTracker
-from heartwave.sceneanalyzer import SceneAnalyzer
-import heartwave.conf as conf
-import heartwave.util as util
+import asyncio
+import conf as conf
+import datetime
+from facetracker import FaceTracker
+import functools
+from pathlib import Path
+from sceneanalyzer import SceneAnalyzer
+import sys
+import util as util
+from videostream import VideoStream
+from widgets import View, CurveWidget
 
 
 class Window(qt.QMainWindow):
@@ -24,6 +22,12 @@ class Window(qt.QMainWindow):
         self.setCentralWidget(self.view)
         self.curves = CurveWidget()
         self.curves.show()
+        self.pheight, ok = qt.QInputDialog.getDouble(self.view, "Insert Weight", """weight in pounds""")
+        self.pweight, ok = qt.QInputDialog.getDouble(self.view, "Insert Height", """height """)
+        self.age, ok = qt.QInputDialog.getInt(self.view, "insert your age", """age testing:""")
+
+        if not ok:
+            sys.exit(qt.qApp.exec_())
 
         def addAction(menu, name, shortcut, cb):
             action = qt.QAction(name, self)
@@ -91,6 +95,7 @@ class Window(qt.QMainWindow):
         scene = self.video | FaceTracker | SceneAnalyzer
         lastScene = scene.aiter(skip_to_last=True)
         async for frame, persons in lastScene:
+            persons.setBoilerPlate(self.pweight, self.pweight, self.age)
             self.view.draw(frame.image, persons)
             if self.curves.isVisible():
                 self.curves.plot(persons)
